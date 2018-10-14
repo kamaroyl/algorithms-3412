@@ -2,6 +2,7 @@ package main
 import (
        "hw2/FileHandler"
        "hw2/HashTable"
+       "hw2/MyMapImpl"
        "hw2/OrderedVector"
        "hw2/UnorderedVector"
        "hw2/WordFrequency"
@@ -74,7 +75,7 @@ func main() {
     }
     
     if *method == 2 {
-        var concordance *map[string]int = runTimeHashMap(HashTable.BuildConcordance, &words)
+        var concordance *MyMapImpl[string]int = runTimeHashMap(HashTable.BuildConcordance, &words)
         
         if *debug {
             fmt.Println("a: ", (*concordance)["a"])

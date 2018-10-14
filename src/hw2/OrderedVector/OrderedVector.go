@@ -12,13 +12,12 @@ import(
  */
 func searchWord(word *string, s *[]*WordFrequency.WordFrequency) (int, int){
     comparison := 0
-    assignment := 0
+    length := len(*s)
     if len(*s) == 0 {
         comparison++
-        assignment++
         tmp := &WordFrequency.WordFrequency{ Word: *word, Frequency: 1 }
         *s = append(*s, tmp)
-        return comparison, assignment     
+        return comparison, length     
     }
 
     low  := 0
@@ -33,10 +32,9 @@ func searchWord(word *string, s *[]*WordFrequency.WordFrequency) (int, int){
             high = middle - 1
         } else {
             (*((*s)[middle])).Frequency++
-            return comparison, assignment
+            return comparison, length
         }
     }
-    assignment++
     tmp := &WordFrequency.WordFrequency{ Word: *word, Frequency: 1}
     if (*((*s)[middle])).Word < *word {
         for (middle < len(*s) && (*((*s)[middle])).Word < *word) {
@@ -48,8 +46,10 @@ func searchWord(word *string, s *[]*WordFrequency.WordFrequency) (int, int){
             middle--
         }
         insertIntoSliceAtPosition(s, tmp, middle)
-    }
-    return comparison, assignment
+        }
+    
+
+    return comparison, length
 }
 
 //From https://github.com/golang/go/wiki/SliceTricks
@@ -70,15 +70,20 @@ func insertIntoSliceAtPosition(s *[]*WordFrequency.WordFrequency, add *WordFrequ
 }
 
 func BuildConcordance(words *[]*string) *[]*WordFrequency.WordFrequency {
-    var comparison = 0
-    var assignment = 0
+    var comparison = make(map[int]int)
     var concordance []*WordFrequency.WordFrequency
     for _, word := range *words {
-        tmpComparison, tmpAssignment := searchWord(word, &concordance)
-        comparison+=tmpComparison
-        assignment+=tmpAssignment
+        tmpComparison, tmpLength := searchWord(word, &concordance)
+        tmpEntry := comparison[tmpLength]
+        if tmpEntry > 0 {
+            comparison[tmpLength] = (tmpEntry + tmpComparison)/2
+        } else {
+            comparison[tmpLength] = tmpComparison
+        }
     }
-    fmt.Println("comparison ", comparison, " assignment ", assignment)
+    for key, value := range comparison {
+        fmt.Println(key, ",", value)
+    }
     return &concordance
 }
 
