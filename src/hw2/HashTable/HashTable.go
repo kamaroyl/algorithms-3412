@@ -1,22 +1,36 @@
 package HashTable
 
-import "fmt"
+import (
+        "fmt"
+        "hw2/MyMapImpl"
+       )
 
-func BuildConcordance(words *[]*string) *map[string]int {
-    var comparison = 0
-    var assignment = 0
-    var concordance = make(map[string]int)
+func BuildConcordance(words *[]*string) *MyMapImpl.MyMap {
+    var comparisons = make(map[int]int)
+    var concordance = MyMapImpl.NewMyMap()
     for _, wordPtr := range *words {
-        tmp := concordance[*wordPtr]
-        comparison ++
+        tmp := concordance.At(*wordPtr)
         if tmp > 0 {
             tmp++
-            concordance[*wordPtr] = tmp
+            comparison := concordance.Add(*wordPtr, tmp)
+            tmpValue := comparisons[concordance.Len()]
+            if tmpValue > 0 {
+                comparisons[concordance.Len()] = (tmpValue + comparison)/2
+            } else {
+                comparisons[concordance.Len()] = comparison
+            }
         } else {
-        assignment ++
-            concordance[*wordPtr] = 1
+            comparison := concordance.Add(*wordPtr, 1)
+            tmpValue := comparisons[concordance.Len()]
+            if tmpValue > 0 {
+                comparisons[concordance.Len()] = (tmpValue + comparison)/2
+            } else {
+                comparisons[concordance.Len()] = comparison
+            }
         }
     }
-    fmt.Println("comparison ", comparison, " assignment ", assignment)
-    return &concordance
+    for key, value := range comparisons {
+        fmt.Println(key, ",", value)
+    }
+    return concordance
 }

@@ -25,7 +25,7 @@ func runTime(fp func(*[]*string)*[]*WordFrequency.WordFrequency, words *[]*strin
     return val
 }
 
-func runTimeHashMap(fp func(*[]*string)*map[string]int, words *[]*string) *map[string]int {
+func runTimeHashMap(fp func(*[]*string)*MyMapImpl.MyMap, words *[]*string) *MyMapImpl.MyMap {
     start := time.Now()
     var val = fp(words)
     finish := time.Now()
@@ -75,29 +75,29 @@ func main() {
     }
     
     if *method == 2 {
-        var concordance *MyMapImpl[string]int = runTimeHashMap(HashTable.BuildConcordance, &words)
+        var concordance *MyMapImpl.MyMap = runTimeHashMap(HashTable.BuildConcordance, &words)
         
         if *debug {
-            fmt.Println("a: ", (*concordance)["a"])
-            fmt.Println("a': ", (*concordance)["a'"])
-            fmt.Println("a's: ", (*concordance)["a's"]) 
-            fmt.Println("a-bat-fowling: ", (*concordance)["a-bat-fowling"])
-            fmt.Println("a-bed: ", (*concordance)["a-bed"])
-            fmt.Println("a-birding: ", (*concordance)["a-birding"])
-            fmt.Println("a-bleeding: ", (*concordance)["a-bleeding"])
-            fmt.Println("a-breeding: ", (*concordance)["a-breeding"])
-            fmt.Println("a-brewing: ", (*concordance)["a-brewing"])
-            fmt.Println("a-broach: ", (*concordance)["a-broach"])
-            fmt.Println("zenelophon: ", (*concordance)["zenelophon"])
-            fmt.Println("zenith: ", (*concordance)["zenith"])
-            fmt.Println("zephyrs: ", (*concordance)["zephyrs"])
-            fmt.Println("zo: ", (*concordance)["zo"])
-            fmt.Println("zodiac: ", (*concordance)["zodiac"])
-            fmt.Println("zodiacs: ", (*concordance)["zodiacs"])
-            fmt.Println("zone: ", (*concordance)["zone"])
-            fmt.Println("zounds", (*concordance)["zounds"])
-            fmt.Println("zur: ", (*concordance)["zur"])
-            fmt.Println("zwaggered: ", (*concordance)["zwaggered"])
+            fmt.Println("a: ", (*concordance).At("a"))
+            fmt.Println("a': ", (*concordance).At("a'"))
+            fmt.Println("a's: ", (*concordance).At("a's")) 
+            fmt.Println("a-bat-fowling: ", (*concordance).At("a-bat-fowling"))
+            fmt.Println("a-bed: ", (*concordance).At("a-bed"))
+            fmt.Println("a-birding: ", (*concordance).At("a-birding"))
+            fmt.Println("a-bleeding: ", (*concordance).At("a-bleeding"))
+            fmt.Println("a-breeding: ", (*concordance).At("a-breeding"))
+            fmt.Println("a-brewing: ", (*concordance).At("a-brewing"))
+            fmt.Println("a-broach: ", (*concordance).At("a-broach"))
+            fmt.Println("zenelophon: ", (*concordance).At("zenelophon"))
+            fmt.Println("zenith: ", (*concordance).At("zenith"))
+            fmt.Println("zephyrs: ", (*concordance).At("zephyrs"))
+            fmt.Println("zo: ", (*concordance).At("zo"))
+            fmt.Println("zodiac: ", (*concordance).At("zodiac"))
+            fmt.Println("zodiacs: ", (*concordance).At("zodiacs"))
+            fmt.Println("zone: ", (*concordance).At("zone"))
+            fmt.Println("zounds", (*concordance).At("zounds"))
+            fmt.Println("zur: ", (*concordance).At("zur"))
+            fmt.Println("zwaggered: ", (*concordance).At("zwaggered"))
             /*for key, value := range *concordance {
                 fmt.Println("{ ", key, " ", value, " }")
             }*/
