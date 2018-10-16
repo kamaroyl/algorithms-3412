@@ -10,9 +10,9 @@ func BuildConcordance(words *[]*string) *MyMapImpl.MyMap {
     var concordance = MyMapImpl.NewMyMap()
     for _, wordPtr := range *words {
         tmp := concordance.At(*wordPtr)
-        if tmp > 0 {
-            tmp++
-            comparison := concordance.Add(*wordPtr, tmp)
+        if *tmp > 0 {
+            (*tmp)++
+            comparison := concordance.Add(*wordPtr, *tmp)
             tmpValue := comparisons[concordance.Len()]
             if tmpValue > 0 {
                 comparisons[concordance.Len()] = (tmpValue + comparison)/2

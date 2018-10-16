@@ -5,13 +5,20 @@ import (
     "fmt"
 )
 
+type entry struct {
+	key   *string
+	value *int
+        next  *entry
+}
+
 type MyMap struct {
-	table  map[uint32][]entry // maps hash to bucket; entry.key==nil means unused
-	length int                // number of map entries
+        // ~.25 load
+	table  [100000]*entry
+	length int            
 }
 
 func NewMyMap() *MyMap {
-    return &MyMap{ table: make(map[uint32][]entry), length: 0}
+    return &MyMap{ length: 0}
 }
 
 func hashString(s string) uint32 {
@@ -20,71 +27,90 @@ func hashString(s string) uint32 {
 		h ^= uint32(s[i])
 		h *= 16777619
 	}
-	return h
-}
-
-
-type entry struct {
-	key   *string
-	value *int
+	return h%100000
 }
 
 func (m *MyMap) Remove(key string) bool {
-	if m != nil && m.table != nil {
+	if m != nil {
 		hash := hashString(key)
-		bucket := m.table[hash]
-		for i, e := range bucket {
-			if e.key != nil && key == *e.key {
-				// We can't compact the bucket as it
-				// would disturb iterators.
-				bucket[i] = entry{}
-				m.length--
-				return true
-			}
+		bucketHead := m.table[hash]
+                if (*(*bucketHead).key) == key {
+                    tmp := bucketHead
+                    (*tmp).key   = nil
+                    (*tmp).value = nil
+                    (*tmp).next  = nil
+                    tmp          = nil
+                    bucketHead = bucketHead.next
+                }
+		for {
+                    if (*bucketHead).next == nil {
+                        break
+                    }
+                    if (*(*(*bucketHead).next).key) == key {
+                        tmp := (*bucketHead).next
+                        (*tmp).key   = nil
+                        (*tmp).value = nil
+                        (*tmp).next  = nil
+                        tmp          = nil
+
+                        (*bucketHead).next = (*(*bucketHead).next).next
+                        m.length--
+                        return true
+                    }
+		    bucketHead = (*bucketHead).next
+ 
 		}
 	}
 	return false
 }
 
-func (m *MyMap) At(key string) int {
-	if m != nil && m.table != nil {
-		for _, e := range m.table[hashString(key)] {
-			if e.key != nil && key == *e.key {
-				return *e.value
-			}
-		}
-	}
-	return 0
+func (m *MyMap) At(key string) *int {
+    result := 0
+    if m != nil {
+        bucketHead := m.table[hashString(key)] 
+        if bucketHead == nil{
+            return &result
+        }
+        if (*(*bucketHead).key) == key {
+            return (*bucketHead).value
+        }
+        for {
+            if (*(*bucketHead).key) == key {
+                return (*bucketHead).value
+            } 
+            if (*bucketHead).next == nil {
+                break
+            }
+            bucketHead = (*bucketHead).next
+        }
+    }
+	return &result
 }
 
 func (m *MyMap) Add(key string, value int) int {
-        comparisons := 0
-	if m.table != nil {
-		hash := hashString(key)
-		bucket := m.table[hash]
-		var hole *entry
-		for i, e := range bucket {
-                        comparisons++
-			if e.key == nil {
-				hole = &bucket[i]
-			} else if key == (*e.key) {
-				*bucket[i].value = value
-				return comparisons
-			}
-		}
-
-		if hole != nil {
-			*hole = entry{&key, &value} // overwrite deleted entry
-		} else {
-			m.table[hash] = append(bucket, entry{&key, &value})
-		}
-	} else {
-		hash := hashString(key)
-		m.table = map[uint32][]entry{hash: {entry{&key, &value}}}
-	}
-
-	m.length++
-	return comparisons
+    comparisons := 0
+    hash := hashString(key)
+    bucketHead := m.table[hash]
+    comparisons++
+    if bucketHead == nil {
+        bucketHead = &entry{ key: &key, value: &value, next: nil }
+        m.table[hash] = bucketHead
+        m.length ++
+        return comparisons
+    }
+    for {
+         comparisons++
+         if (*(*bucketHead).key) == key {
+             (*(*bucketHead).value) = value
+             return comparisons
+         }
+         if (*bucketHead).next == nil {
+             (*bucketHead).next = &entry{ key: &key, value: &value, next: nil }
+             m.length++
+             return comparisons
+         }
+         bucketHead = (*bucketHead).next
+    }
 }
 
 func (m *MyMap) Len() int {
@@ -95,15 +121,15 @@ func (m *MyMap) Len() int {
 }
 
 func (m *MyMap) Iterate(f func(key string, value int)) {
-	if m != nil {
-		for _, bucket := range m.table {
-			for _, e := range bucket {
-				if e.key != nil {
-					f(*e.key, *e.value)
-				}
-			}
+    if m != nil {
+        for _, bucket := range m.table {
+            for {
+                if bucket != nil {
+                    f((*(*bucket).key), (*(*bucket).value))
 		}
+	    }
 	}
+    }
 }
 
 // Keys returns a new slice containing the set of map keys.
